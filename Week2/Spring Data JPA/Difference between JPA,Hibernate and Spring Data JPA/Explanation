@@ -1,0 +1,148 @@
+1. Java Persistence API (JPA)
+Definition
+JPA stands for Java Persistence API.
+It is a Java specification (JSR 338) for storing and retrieving data from a database.
+It defines interfaces and annotations but does not provide an implementation.
+Features
+Standard API for ORM
+Uses annotations like:
+@Entity
+@Table
+@Id
+@Column
+Portable across different ORM frameworks.
+2. Hibernate
+Definition
+
+Hibernate is an ORM (Object Relational Mapping) framework that implements JPA.
+
+It converts Java objects into database tables.
+
+Features
+Implements JPA
+Generates SQL automatically
+Maps Java objects to database tables
+Handles CRUD operations
+Supports caching and lazy loading
+3. Spring Data JPA
+Definition
+
+Spring Data JPA is built on top of JPA.
+
+It does not implement JPA but simplifies database programming by reducing boilerplate code.
+
+Features
+Uses Hibernate internally
+Automatically manages transactions
+Automatically creates SQL queries
+Provides built-in repository methods
+
+Example:
+
+findAll()
+
+save()
+
+delete()
+
+findById()
+Relationship
+Spring Data JPA
+        │
+        ▼
+Hibernate
+        │
+        ▼
+JPA Specification
+        │
+        ▼
+Database
+Hibernate Code
+
+Without Spring Data JPA you have to write lots of code.
+
+public Integer addEmployee(Employee employee){
+
+    Session session = factory.openSession();
+
+    Transaction tx = null;
+
+    Integer employeeID = null;
+
+    try{
+
+        tx = session.beginTransaction();
+
+        employeeID = (Integer) session.save(employee);
+
+        tx.commit();
+
+    }
+
+    catch(HibernateException e){
+
+        if(tx!=null)
+
+            tx.rollback();
+
+    }
+
+    finally{
+
+        session.close();
+
+    }
+
+    return employeeID;
+}
+
+Notice you manually:
+
+Open Session
+Begin Transaction
+Save Object
+Commit
+Rollback
+Close Session
+Spring Data JPA Code
+
+Repository
+
+public interface EmployeeRepository
+        extends JpaRepository<Employee,Integer>{
+
+}
+
+Service
+
+@Service
+public class EmployeeService {
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    @Transactional
+    public void addEmployee(Employee employee){
+
+        employeeRepository.save(employee);
+
+    }
+
+}
+
+
+Why Spring Data JPA is Better
+Hibernate	Spring Data JPA
+More code	Very little code
+Manual transaction management	Automatic transaction management
+Manual session handling	No session handling
+Manual CRUD queries	Built-in CRUD methods
+More development time	Faster development
+Comparison Table
+Feature	JPA	Hibernate	Spring Data JPA
+Type	Specification	ORM Framework	Spring Module
+Implementation	No	Yes	No
+CRUD Support	Defines methods	Implements CRUD	Provides ready-made CRUD
+Boilerplate Code	Medium	High	Very Low
+Transaction Management	No	Manual	Automatic
+Used With	Hibernate, EclipseLink	JPA	Hibernate
